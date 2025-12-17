@@ -14,7 +14,7 @@
 //! - All types from `ratatui::prelude::*`
 //! - Core component traits: [`Component`], [`Focusable`], [`Renderable`]
 //! - Convenience types: [`FocusWrapper`], [`FocusableComponent`]
-//! - Input types: [`Action`], [`KeyBinding`], [`KeySequence`], [`InputMatcher`]
+//! - Input types: [`Action`], [`KeyBinding`], [`KeyBindings`], [`KeySequence`], [`InputMatcher`]
 
 // Re-export ratatui prelude for convenience
 pub use ratatui::prelude::*;
@@ -25,7 +25,9 @@ pub use crate::components::{
 };
 
 // Input types
-pub use crate::input::{Action, InputMatcher, KeyBinding, KeySequence, MatchResult};
+pub use crate::input::{
+    Action, InputMatcher, KeyBinding, KeyBindings, KeyBindingsBuilder, KeySequence, MatchResult,
+};
 
 // Module re-exports
 pub use crate::components;
