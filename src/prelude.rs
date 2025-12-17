@@ -6,11 +6,24 @@
 //! ```rust
 //! use tuilib::prelude::*;
 //! ```
+//!
+//! # Included Types and Traits
+//!
+//! This prelude includes:
+//!
+//! - All types from `ratatui::prelude::*`
+//! - Core component traits: [`Component`], [`Focusable`], [`Renderable`]
+//! - Convenience types: [`FocusWrapper`], [`FocusableComponent`]
 
 // Re-export ratatui prelude for convenience
 pub use ratatui::prelude::*;
 
-// Component exports will be added as components are implemented
+// Core component traits
+pub use crate::components::{
+    Component, FocusWrapper, Focusable, FocusableComponent, Renderable, StatelessComponent,
+};
+
+// Module re-exports
 pub use crate::components;
 pub use crate::event;
 pub use crate::focus;
