@@ -1,6 +1,26 @@
 [package]
 name = "tuilib"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+description = "An opinionated TUI component library with input action mapping built on ratatui"
+license = "MIT"
+repository = "https://github.com/jonbito/tuilib"
+keywords = ["tui", "terminal", "ratatui", "components", "ui"]
+categories = ["command-line-interface", "gui"]
+rust-version = "1.70"
 
 [dependencies]
+ratatui = "0.29"
+crossterm = { version = "0.28", optional = true }
+terminput = "0.4"
+terminput-crossterm = { version = "0.4", optional = true }
+tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[features]
+default = ["crossterm-backend"]
+crossterm-backend = ["dep:crossterm", "dep:terminput-crossterm"]
