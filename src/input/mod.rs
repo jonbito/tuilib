@@ -11,9 +11,37 @@
 //! - [`Action`]: Named semantic actions like "quit", "save", "navigate_up"
 //! - [`KeyBinding`]: A single key with optional modifiers (e.g., "Ctrl+S")
 //! - [`KeySequence`]: One or more keys in sequence (e.g., "Ctrl+X Ctrl+S")
+//! - [`KeyBindings`]: Container for keybindings with context support
+//! - [`KeyBindingsBuilder`]: Fluent API for declarative keybinding configuration
 //! - [`InputMatcher`]: Matches input events against registered bindings
 //!
 //! # Quick Start
+//!
+//! ## Using KeyBindings Builder (Recommended)
+//!
+//! ```rust
+//! use tuilib::input::{KeyBindings, Action};
+//!
+//! // Create bindings with the builder API
+//! let bindings = KeyBindings::builder()
+//!     .bind("quit", "Ctrl+q")
+//!     .bind("save", "Ctrl+s")
+//!     .bind_multi("navigate_up", &["k", "Up"])
+//!     .context("modal", |ctx| {
+//!         ctx.bind("close", "Escape")
+//!            .bind("confirm", "Enter")
+//!     })
+//!     .build();
+//!
+//! // Look up actions
+//! use tuilib::input::parser::parse_key_binding;
+//! let ctrl_q = parse_key_binding("Ctrl+q").unwrap();
+//! if let Some(action) = bindings.lookup(None, &ctrl_q.into()) {
+//!     println!("Action: {}", action.name());
+//! }
+//! ```
+//!
+//! ## Using InputMatcher (Low-level)
 //!
 //! ```rust
 //! use tuilib::input::{Action, InputMatcher, KeyBinding, KeySequence, ctrl, char_key};
@@ -83,6 +111,20 @@
 //! let exit_seq = seq2(ctrl('x'), ctrl('c'));
 //! ```
 //!
+//! # String Parsing
+//!
+//! The [`parser`] module provides string parsing for key combinations:
+//!
+//! ```rust
+//! use tuilib::input::parser::{parse_key_binding, parse_key_sequence};
+//!
+//! // Parse single binding
+//! let binding = parse_key_binding("Ctrl+Shift+s").unwrap();
+//!
+//! // Parse key sequence
+//! let sequence = parse_key_sequence("Ctrl+x Ctrl+s").unwrap();
+//! ```
+//!
 //! # Common Bindings
 //!
 //! The [`common`] module provides pre-defined bindings for typical keys:
@@ -95,16 +137,41 @@
 //! let ctrl_c = common::ctrl_c();
 //! let up = common::up();
 //! ```
+//!
+//! # Configuration Support
+//!
+//! Keybindings can be loaded from configuration files using serde:
+//!
+//! ```rust
+//! use tuilib::input::KeyBindingsConfig;
+//!
+//! // Parse from TOML, JSON, or YAML
+//! let config: KeyBindingsConfig = toml::from_str(r#"
+//! [global]
+//! quit = "Ctrl+q"
+//! save = "Ctrl+s"
+//! navigate_up = ["k", "Up"]
+//!
+//! [contexts.modal]
+//! close = "Escape"
+//! confirm = "Enter"
+//! "#).unwrap();
+//!
+//! let bindings = config.into_key_bindings().unwrap();
+//! ```
 
 mod action;
 mod binding;
+pub mod bindings;
 mod matcher;
+pub mod parser;
 mod sequence;
 mod terminput_ext;
 
 // Core types
 pub use action::Action;
 pub use binding::KeyBinding;
+pub use bindings::{ContextBuilder, KeyBindings, KeyBindingsBuilder, KeyBindingsConfig, KeyOrKeys};
 pub use matcher::{InputMatcher, MatchResult};
 pub use sequence::{KeySequence, KeySequenceBuilder};
 
