@@ -1,4 +1,4 @@
-//! Input handling module with action mapping.
+//! Input handling module with action mapping and routing.
 //!
 //! This module provides input action mapping functionality using terminput.
 //! It allows mapping keyboard and mouse events to semantic actions,
@@ -8,12 +8,22 @@
 //!
 //! The input system consists of several key components:
 //!
+//! ## Key Binding
+//!
 //! - [`Action`]: Named semantic actions like "quit", "save", "navigate_up"
 //! - [`KeyBinding`]: A single key with optional modifiers (e.g., "Ctrl+S")
 //! - [`KeySequence`]: One or more keys in sequence (e.g., "Ctrl+X Ctrl+S")
 //! - [`KeyBindings`]: Container for keybindings with context support
 //! - [`KeyBindingsBuilder`]: Fluent API for declarative keybinding configuration
 //! - [`InputMatcher`]: Matches input events against registered bindings
+//!
+//! ## Action Routing
+//!
+//! - [`ActionHandler`]: Trait for components that can handle actions
+//! - [`ActionRouter`]: Routes actions through the component hierarchy
+//! - [`Phase`]: Capture or bubble phase for action propagation
+//! - [`HandleResult`]: Result of handling an action (Continue, Handled, Ignored)
+//! - [`ActionMiddleware`]: Middleware for logging/transforming actions
 //!
 //! # Quick Start
 //!
@@ -159,12 +169,56 @@
 //!
 //! let bindings = config.into_key_bindings().unwrap();
 //! ```
+//!
+//! # Action Routing
+//!
+//! The action router dispatches actions through a component hierarchy with
+//! capture and bubble phases, similar to DOM events:
+//!
+//! ```rust
+//! use tuilib::input::{Action, ActionRouter, ActionHandler, Phase, HandleResult};
+//!
+//! struct MyComponent {
+//!     id: String,
+//!     focused: bool,
+//!     children: Vec<Box<dyn ActionHandler>>,
+//! }
+//!
+//! impl ActionHandler for MyComponent {
+//!     fn handle(&mut self, action: &Action, phase: Phase) -> HandleResult {
+//!         if phase == Phase::Bubble && action.name() == "activate" {
+//!             println!("Component {} activated!", self.id);
+//!             return HandleResult::Handled;
+//!         }
+//!         HandleResult::Continue
+//!     }
+//!
+//!     fn id(&self) -> &str { &self.id }
+//!     fn is_focused(&self) -> bool { self.focused }
+//!     fn children(&self) -> &[Box<dyn ActionHandler>] { &self.children }
+//!     fn children_mut(&mut self) -> &mut [Box<dyn ActionHandler>] { &mut self.children }
+//! }
+//!
+//! let mut router = ActionRouter::new();
+//! let mut component = MyComponent {
+//!     id: "root".to_string(),
+//!     focused: true,
+//!     children: vec![],
+//! };
+//!
+//! // Dispatch an action
+//! let result = router.dispatch(&mut component, Action::new("activate"));
+//! assert!(result.was_handled());
+//! ```
 
 mod action;
 mod binding;
 pub mod bindings;
+mod handler;
 mod matcher;
+pub mod middleware;
 pub mod parser;
+mod router;
 mod sequence;
 mod terminput_ext;
 
@@ -172,7 +226,12 @@ mod terminput_ext;
 pub use action::Action;
 pub use binding::KeyBinding;
 pub use bindings::{ContextBuilder, KeyBindings, KeyBindingsBuilder, KeyBindingsConfig, KeyOrKeys};
+pub use handler::{ActionHandler, HandleResult, Phase};
 pub use matcher::{InputMatcher, MatchResult};
+pub use middleware::{
+    ActionMiddleware, MiddlewareChain, MiddlewareResult, PassthroughMiddleware, TracingMiddleware,
+};
+pub use router::{ActionRouter, DispatchResult};
 pub use sequence::{KeySequence, KeySequenceBuilder};
 
 // Terminput helpers
