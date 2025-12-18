@@ -19,6 +19,8 @@
 //! - Theme types: [`Theme`], [`ThemeBuilder`], [`ColorPalette`]
 //! - Event loop types: [`EventLoop`], [`EventLoopConfig`], [`AppEvent`], [`ControlFlow`]
 //! - Timing utilities: [`Debouncer`], [`Throttle`]
+//! - Tracing types: [`TracingConfig`], and with `tracing-setup` feature: [`init_tracing`], [`TracingGuard`]
+//! - Tracing macros: [`component_update_span!`], [`component_render_span!`], [`focus_span!`]
 
 // Re-export ratatui prelude for convenience
 pub use ratatui::prelude::*;
@@ -42,9 +44,18 @@ pub use crate::theme::{ColorPalette, Theme, ThemeBuilder};
 // Event loop types
 pub use crate::event::{AppEvent, ControlFlow, Debouncer, EventLoop, EventLoopConfig, Throttle};
 
+// Tracing types
+pub use crate::tracing::TracingConfig;
+#[cfg(feature = "tracing-setup")]
+pub use crate::tracing::{init_tracing, TracingError, TracingGuard};
+
+// Re-export tracing macros for convenience
+pub use crate::{component_render_span, component_update_span, focus_span};
+
 // Module re-exports
 pub use crate::components;
 pub use crate::event;
 pub use crate::focus;
 pub use crate::input;
 pub use crate::theme;
+pub use crate::tracing;

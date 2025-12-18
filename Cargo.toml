@@ -16,6 +16,8 @@ terminput = "0.4"
 terminput-crossterm = { version = "0.4", optional = true }
 tokio = { version = "1.0", features = ["full"] }
 tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
+tracing-appender = { version = "0.2", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 
 [dev-dependencies]
@@ -25,3 +27,8 @@ toml = "0.8"
 [features]
 default = ["crossterm-backend"]
 crossterm-backend = ["dep:crossterm", "dep:terminput-crossterm"]
+tracing-setup = ["dep:tracing-subscriber", "dep:tracing-appender"]
+
+[[example]]
+name = "tracing_setup"
+required-features = ["tracing-setup"]

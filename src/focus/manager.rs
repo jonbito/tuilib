@@ -5,6 +5,7 @@
 //! and focus restoration.
 
 use super::{FocusId, FocusRing, FocusTrap};
+use tracing::{debug, instrument};
 
 /// Focus navigation direction.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -203,6 +204,7 @@ impl FocusManager {
     /// let result = manager.navigate(FocusDirection::Next);
     /// assert!(matches!(result, FocusResult::Moved { to, .. } if to == FocusId::new("a")));
     /// ```
+    #[instrument(skip(self), fields(direction = ?direction, has_trap = self.has_trap()))]
     pub fn navigate(&mut self, direction: FocusDirection) -> FocusResult {
         // Get current focus before navigation (must be done separately to avoid borrow issues)
         let from = if let Some(trap) = self.traps.last() {
@@ -224,7 +226,7 @@ impl FocusManager {
             }
         };
 
-        match to {
+        let result = match to {
             Some(to_id) => {
                 if from.as_ref() == Some(&to_id) {
                     FocusResult::Unchanged(to_id)
@@ -233,7 +235,10 @@ impl FocusManager {
                 }
             }
             None => FocusResult::NoFocusables,
-        }
+        };
+
+        debug!(?result, "Focus navigation completed");
+        result
     }
 
     /// Moves focus to the next component (Tab behavior).
@@ -346,11 +351,13 @@ impl FocusManager {
     ///
     /// assert!(manager.has_trap());
     /// ```
+    #[instrument(skip(self, trap), fields(trap_items = trap.len()))]
     pub fn push_trap(&mut self, mut trap: FocusTrap) {
         // Save current focus for restoration
         let current = self.current().cloned();
-        if let Some(id) = current {
-            self.restoration_stack.push(id);
+        if let Some(ref id) = current {
+            debug!(?id, "Saving current focus for restoration");
+            self.restoration_stack.push(id.clone());
         }
 
         // Focus first item in trap if nothing is focused
@@ -358,6 +365,7 @@ impl FocusManager {
             trap.next();
         }
 
+        debug!(trap_count = self.traps.len() + 1, "Focus trap pushed");
         self.traps.push(trap);
     }
 
@@ -385,11 +393,13 @@ impl FocusManager {
     /// assert!(!manager.has_trap());
     /// assert_eq!(manager.current(), Some(&FocusId::new("main")));
     /// ```
+    #[instrument(skip(self))]
     pub fn pop_trap(&mut self) -> Option<FocusTrap> {
         let trap = self.traps.pop()?;
 
         // Restore previous focus
         if let Some(saved_id) = self.restoration_stack.pop() {
+            debug!(?saved_id, "Restoring saved focus");
             if self.traps.is_empty() {
                 // Restoring to main ring
                 self.ring.focus(&saved_id);
@@ -401,6 +411,7 @@ impl FocusManager {
             }
         }
 
+        debug!(remaining_traps = self.traps.len(), "Focus trap popped");
         Some(trap)
     }
 
