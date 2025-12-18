@@ -11,7 +11,7 @@ This example demonstrates the core features of tuilib's Phase 1 infrastructure:
 ## Running the Example
 
 ```sh
-cargo run --example basic_app --features tracing-setup
+cargo run --example basic_app
 ```
 
 After running, check `basic_app.log` for trace output.

@@ -11,7 +11,7 @@
 //! # Running the Example
 //!
 //! ```sh
-//! cargo run --example basic_app --features tracing-setup
+//! cargo run --example basic_app
 //! ```
 //!
 //! After running, check `basic_app.log` for trace output.
@@ -35,25 +35,19 @@
 //! 5. Run an async event loop that handles terminal input, ticks, and shutdown
 //! 6. Render a themed UI using ratatui
 
-use std::io::{self, stdout};
 use std::time::Duration;
 
-use crossterm::{
-    event::{DisableMouseCapture, EnableMouseCapture, KeyEventKind},
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-};
+use crossterm::event::KeyEventKind;
 use ratatui::{
-    backend::CrosstermBackend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     text::{Line, Span},
     widgets::{Block, Borders, Paragraph},
-    Frame, Terminal,
+    Frame,
 };
 use terminput_crossterm::to_terminput_key;
 use tuilib::{
     component_render_span, component_update_span,
-    event::{AppEvent, ControlFlow, EventLoop, EventLoopConfig},
+    event::{restore_terminal, setup_terminal, AppEvent, ControlFlow, EventLoop, EventLoopConfig},
     focus::{FocusDirection, FocusId, FocusManager},
     focus_span,
     input::{Action, InputMatcher, KeyBindings},
@@ -398,31 +392,6 @@ impl App {
             );
         frame.render_widget(help, area);
     }
-}
-
-// =============================================================================
-// Terminal Setup
-// =============================================================================
-
-/// Sets up the terminal for the TUI application.
-fn setup_terminal() -> io::Result<Terminal<CrosstermBackend<io::Stdout>>> {
-    enable_raw_mode()?;
-    let mut stdout = stdout();
-    execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
-    let backend = CrosstermBackend::new(stdout);
-    Terminal::new(backend)
-}
-
-/// Restores the terminal to its original state.
-fn restore_terminal(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> io::Result<()> {
-    disable_raw_mode()?;
-    execute!(
-        terminal.backend_mut(),
-        LeaveAlternateScreen,
-        DisableMouseCapture
-    )?;
-    terminal.show_cursor()?;
-    Ok(())
 }
 
 // =============================================================================

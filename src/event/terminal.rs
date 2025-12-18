@@ -23,13 +23,11 @@ use std::time::Duration;
 ///     }
 /// }
 /// ```
-#[cfg(feature = "crossterm-backend")]
 pub struct TerminalEventStream {
     /// Polling timeout for non-blocking event checks.
     poll_timeout: Duration,
 }
 
-#[cfg(feature = "crossterm-backend")]
 impl TerminalEventStream {
     /// Creates a new terminal event stream.
     pub fn new() -> Self {
@@ -100,14 +98,12 @@ impl TerminalEventStream {
     }
 }
 
-#[cfg(feature = "crossterm-backend")]
 impl Default for TerminalEventStream {
     fn default() -> Self {
         Self::new()
     }
 }
 
-#[cfg(feature = "crossterm-backend")]
 impl std::fmt::Debug for TerminalEventStream {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("TerminalEventStream")
@@ -116,23 +112,78 @@ impl std::fmt::Debug for TerminalEventStream {
     }
 }
 
-/// Stub for when crossterm-backend is not enabled.
-#[cfg(not(feature = "crossterm-backend"))]
-pub struct TerminalEventStream;
-
-#[cfg(not(feature = "crossterm-backend"))]
-impl TerminalEventStream {
-    /// Creates a new terminal event stream (stub).
-    pub fn new() -> Self {
-        Self
-    }
+/// Sets up the terminal for a TUI application.
+///
+/// This function performs the standard terminal setup sequence:
+/// - Enables raw mode (disabling line buffering and echoing)
+/// - Switches to the alternate screen buffer
+/// - Enables mouse capture
+///
+/// # Returns
+///
+/// A configured `Terminal` with a crossterm backend, ready for rendering.
+///
+/// # Errors
+///
+/// Returns an IO error if terminal setup fails.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// use tuilib::event::setup_terminal;
+///
+/// let mut terminal = setup_terminal()?;
+/// // Use terminal for rendering...
+/// ```
+pub fn setup_terminal(
+) -> std::io::Result<ratatui::Terminal<ratatui::backend::CrosstermBackend<std::io::Stdout>>> {
+    crossterm::terminal::enable_raw_mode()?;
+    let mut stdout = std::io::stdout();
+    crossterm::execute!(
+        stdout,
+        crossterm::terminal::EnterAlternateScreen,
+        crossterm::event::EnableMouseCapture
+    )?;
+    let backend = ratatui::backend::CrosstermBackend::new(stdout);
+    ratatui::Terminal::new(backend)
 }
 
-#[cfg(not(feature = "crossterm-backend"))]
-impl Default for TerminalEventStream {
-    fn default() -> Self {
-        Self::new()
-    }
+/// Restores the terminal to its original state.
+///
+/// This function reverses the setup performed by [`setup_terminal`]:
+/// - Disables raw mode
+/// - Leaves the alternate screen buffer
+/// - Disables mouse capture
+/// - Shows the cursor
+///
+/// # Arguments
+///
+/// * `terminal` - A mutable reference to the terminal to restore
+///
+/// # Errors
+///
+/// Returns an IO error if terminal restoration fails.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// use tuilib::event::{setup_terminal, restore_terminal};
+///
+/// let mut terminal = setup_terminal()?;
+/// // Use terminal for rendering...
+/// restore_terminal(&mut terminal)?;
+/// ```
+pub fn restore_terminal(
+    terminal: &mut ratatui::Terminal<ratatui::backend::CrosstermBackend<std::io::Stdout>>,
+) -> std::io::Result<()> {
+    crossterm::terminal::disable_raw_mode()?;
+    crossterm::execute!(
+        terminal.backend_mut(),
+        crossterm::terminal::LeaveAlternateScreen,
+        crossterm::event::DisableMouseCapture
+    )?;
+    terminal.show_cursor()?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -142,19 +193,15 @@ mod tests {
     #[test]
     fn test_terminal_event_stream_creation() {
         let stream = TerminalEventStream::new();
-        #[cfg(feature = "crossterm-backend")]
         assert_eq!(stream.poll_timeout(), Duration::from_millis(10));
-        let _ = stream;
     }
 
-    #[cfg(feature = "crossterm-backend")]
     #[test]
     fn test_terminal_event_stream_with_timeout() {
         let stream = TerminalEventStream::with_timeout(Duration::from_millis(50));
         assert_eq!(stream.poll_timeout(), Duration::from_millis(50));
     }
 
-    #[cfg(feature = "crossterm-backend")]
     #[test]
     fn test_terminal_event_stream_set_timeout() {
         let mut stream = TerminalEventStream::new();
@@ -168,7 +215,6 @@ mod tests {
         let _ = stream;
     }
 
-    #[cfg(feature = "crossterm-backend")]
     #[test]
     fn test_terminal_event_stream_debug() {
         let stream = TerminalEventStream::new();

@@ -252,12 +252,10 @@ impl TracingConfig {
 ///     Ok(())
 /// } // Guard is dropped here, flushing any buffered logs
 /// ```
-#[cfg(feature = "tracing-setup")]
 pub struct TracingGuard {
     _worker_guard: tracing_appender::non_blocking::WorkerGuard,
 }
 
-#[cfg(feature = "tracing-setup")]
 impl std::fmt::Debug for TracingGuard {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("TracingGuard").finish()
@@ -341,7 +339,6 @@ impl From<std::io::Error> for TracingError {
 /// tracing::info!("Application started");
 /// tracing::debug!(component = "button", "Button rendered");
 /// ```
-#[cfg(feature = "tracing-setup")]
 pub fn init_tracing(config: TracingConfig) -> Result<TracingGuard, TracingError> {
     use tracing_subscriber::fmt::format::FmtSpan;
     use tracing_subscriber::prelude::*;
