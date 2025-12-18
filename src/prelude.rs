@@ -17,6 +17,8 @@
 //! - Input types: [`Action`], [`KeyBinding`], [`KeyBindings`], [`KeySequence`], [`InputMatcher`]
 //! - Focus types: [`FocusId`], [`FocusManager`], [`FocusRing`], [`FocusTrap`]
 //! - Theme types: [`Theme`], [`ThemeBuilder`], [`ColorPalette`]
+//! - Event loop types: [`EventLoop`], [`EventLoopConfig`], [`AppEvent`], [`ControlFlow`]
+//! - Timing utilities: [`Debouncer`], [`Throttle`]
 
 // Re-export ratatui prelude for convenience
 pub use ratatui::prelude::*;
@@ -36,6 +38,9 @@ pub use crate::focus::{FocusDirection, FocusId, FocusManager, FocusResult, Focus
 
 // Theme types
 pub use crate::theme::{ColorPalette, Theme, ThemeBuilder};
+
+// Event loop types
+pub use crate::event::{AppEvent, ControlFlow, Debouncer, EventLoop, EventLoopConfig, Throttle};
 
 // Module re-exports
 pub use crate::components;
