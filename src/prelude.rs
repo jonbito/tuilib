@@ -16,6 +16,7 @@
 //! - Convenience types: [`FocusWrapper`], [`FocusableComponent`]
 //! - Input types: [`Action`], [`KeyBinding`], [`KeyBindings`], [`KeySequence`], [`InputMatcher`]
 //! - Focus types: [`FocusId`], [`FocusManager`], [`FocusRing`], [`FocusTrap`]
+//! - Theme types: [`Theme`], [`ThemeBuilder`], [`ColorPalette`]
 
 // Re-export ratatui prelude for convenience
 pub use ratatui::prelude::*;
@@ -32,6 +33,9 @@ pub use crate::input::{
 
 // Focus types
 pub use crate::focus::{FocusDirection, FocusId, FocusManager, FocusResult, FocusRing, FocusTrap};
+
+// Theme types
+pub use crate::theme::{ColorPalette, Theme, ThemeBuilder};
 
 // Module re-exports
 pub use crate::components;
