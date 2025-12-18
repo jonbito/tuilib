@@ -95,5 +95,5 @@ mod timing;
 
 pub use event_loop::{AppEvent, ControlFlow, EventLoop, EventLoopConfig};
 pub use shutdown::ShutdownSignal;
-pub use terminal::TerminalEventStream;
+pub use terminal::{restore_terminal, setup_terminal, TerminalEventStream};
 pub use timing::{Debouncer, Throttle};

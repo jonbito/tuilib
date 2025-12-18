@@ -25,14 +25,7 @@
 //! The library includes comprehensive tracing integration for debugging TUI applications.
 //! Since TUI applications use stdout for rendering, logs are directed to files.
 //!
-//! To enable tracing setup helpers, add the `tracing-setup` feature:
-//!
-//! ```toml
-//! [dependencies]
-//! tuilib = { version = "0.1", features = ["tracing-setup"] }
-//! ```
-//!
-//! Then initialize tracing in your application:
+//! Initialize tracing in your application:
 //!
 //! ```rust,ignore
 //! use tuilib::tracing::{TracingConfig, init_tracing};
@@ -51,7 +44,7 @@
 //! - [`focus`]: Focus management and navigation
 //! - [`theme`]: Theming and design tokens
 //! - [`event`]: Async event loop infrastructure
-//! - [`tracing`]: Structured logging and debugging (requires `tracing-setup` feature for setup helpers)
+//! - [`tracing`]: Structured logging and debugging with setup helpers
 
 pub mod components;
 pub mod event;

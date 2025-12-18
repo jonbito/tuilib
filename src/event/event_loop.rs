@@ -33,7 +33,6 @@ use crate::input::Action;
 #[derive(Debug, Clone)]
 pub enum AppEvent<M = String> {
     /// A terminal event from crossterm.
-    #[cfg(feature = "crossterm-backend")]
     Terminal(crossterm::event::Event),
 
     /// A matched keybinding action.
@@ -51,7 +50,6 @@ pub enum AppEvent<M = String> {
 
 impl<M> AppEvent<M> {
     /// Returns true if this is a terminal event.
-    #[cfg(feature = "crossterm-backend")]
     pub fn is_terminal(&self) -> bool {
         matches!(self, AppEvent::Terminal(_))
     }
@@ -352,7 +350,6 @@ where
     ///     }
     /// }).await?;
     /// ```
-    #[cfg(feature = "crossterm-backend")]
     pub async fn run<F, Fut>(&mut self, mut handler: F) -> std::io::Result<()>
     where
         F: FnMut(AppEvent<M>) -> Fut,

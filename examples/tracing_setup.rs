@@ -7,7 +7,7 @@
 //! # Running
 //!
 //! ```sh
-//! cargo run --example tracing_setup --features tracing-setup
+//! cargo run --example tracing_setup
 //! ```
 //!
 //! After running, check `debug.log` for the trace output.
