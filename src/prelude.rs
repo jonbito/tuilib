@@ -15,6 +15,7 @@
 //! - Core component traits: [`Component`], [`Focusable`], [`Renderable`]
 //! - Convenience types: [`FocusWrapper`], [`FocusableComponent`]
 //! - Input types: [`Action`], [`KeyBinding`], [`KeyBindings`], [`KeySequence`], [`InputMatcher`]
+//! - Focus types: [`FocusId`], [`FocusManager`], [`FocusRing`], [`FocusTrap`]
 
 // Re-export ratatui prelude for convenience
 pub use ratatui::prelude::*;
@@ -28,6 +29,9 @@ pub use crate::components::{
 pub use crate::input::{
     Action, InputMatcher, KeyBinding, KeyBindings, KeyBindingsBuilder, KeySequence, MatchResult,
 };
+
+// Focus types
+pub use crate::focus::{FocusDirection, FocusId, FocusManager, FocusResult, FocusRing, FocusTrap};
 
 // Module re-exports
 pub use crate::components;
