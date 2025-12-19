@@ -153,6 +153,38 @@ pub struct TextInput {
     theme: Option<Theme>,
 }
 
+impl std::fmt::Debug for TextInput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("TextInput")
+            .field("text", &self.text)
+            .field("cursor", &self.cursor)
+            .field("selection", &self.selection)
+            .field("placeholder", &self.placeholder)
+            .field("max_length", &self.max_length)
+            .field("validator", &self.validator.as_ref().map(|_| "<fn>"))
+            .field("validation_message", &self.validation_message)
+            .field("focused", &self.focused)
+            .field("theme", &self.theme.as_ref().map(|t| t.name()))
+            .finish()
+    }
+}
+
+impl Clone for TextInput {
+    fn clone(&self) -> Self {
+        Self {
+            text: self.text.clone(),
+            cursor: self.cursor,
+            selection: self.selection.clone(),
+            placeholder: self.placeholder.clone(),
+            max_length: self.max_length,
+            validator: None, // Validators cannot be cloned
+            validation_message: self.validation_message.clone(),
+            focused: self.focused,
+            theme: self.theme.clone(),
+        }
+    }
+}
+
 impl Default for TextInput {
     fn default() -> Self {
         Self::new()

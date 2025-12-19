@@ -74,6 +74,7 @@
 
 mod component;
 mod focusable;
+pub mod modal;
 mod renderable;
 mod text_input;
 
