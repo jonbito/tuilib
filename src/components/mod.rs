@@ -75,7 +75,9 @@
 mod component;
 mod focusable;
 mod renderable;
+mod text_input;
 
 pub use component::{Component, FocusableComponent, StatelessComponent};
 pub use focusable::{FocusWrapper, Focusable};
 pub use renderable::Renderable;
+pub use text_input::{TextInput, TextInputAction, TextInputMsg, ValidationResult};
